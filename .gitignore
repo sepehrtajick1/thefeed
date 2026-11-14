@@ -1,0 +1,60 @@
+# Build outputs
+/build/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Cache
+.thefeed/
+
+# Data directories
+thefeeddata/
+data/
+
+# Session data
+session.json
+
+# Environment files
+.env
+.env.local
+
+todo
+todo.md
+security-todo.md
+
+tmp
+.claude
+
+# iOS build artifacts
+ios/Mobile.xcframework
+ios/build
+ios/DerivedData
+ios/*.xcuserdata
+ios/Thefeed.xcodeproj/xcuserdata
+ios/Thefeed.xcodeproj/project.xcworkspace/xcuserdata
+
+# Signing secrets — these belong in the CI provider's encrypted store,
+# never in the repo (App Store Connect API key, certs, keystores, passwords).
+*.p8
+*.p12
+*.mobileprovision
+*.cer
+*.keystore
+keystore.properties
+build/ios/ipa
+
+# Stale backups (sed/in-place edits)
+*.bak
+
+# Generated Windows PE resources (goversioninfo, per-arch, made in CI)
+*.syso
+
+# Python bytecode (integrations/hermes tests)
+__pycache__/

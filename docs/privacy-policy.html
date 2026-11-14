@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>TheFeed — Privacy Policy</title>
+  <style>
+    :root { color-scheme: light dark; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      max-width: 720px;
+      margin: 40px auto;
+      padding: 0 20px;
+      line-height: 1.6;
+      color: #222;
+    }
+    @media (prefers-color-scheme: dark) {
+      body { background: #111; color: #ddd; }
+      a { color: #6cb6ff; }
+    }
+    h1 { font-size: 1.8em; margin-bottom: 0; }
+    h2 { font-size: 1.2em; margin-top: 1.8em; }
+    .updated { color: #888; font-size: .9em; margin-top: 4px; }
+    ul { padding-left: 1.2em; }
+    li { margin: .4em 0; }
+    code { background: rgba(127,127,127,.15); padding: 1px 5px; border-radius: 4px; }
+    .lang-switch { margin-bottom: 24px; }
+    .lang-switch a { margin-right: 12px; }
+    section[hidden] { display: none; }
+    [dir="rtl"] { direction: rtl; text-align: right; }
+    [dir="rtl"] ul { padding-right: 1.2em; padding-left: 0; }
+  </style>
+</head>
+<body>
+
+<div class="lang-switch">
+  <a href="#" onclick="show('en');return false">English</a>
+  <a href="#" onclick="show('fa');return false">فارسی</a>
+</div>
+
+<section id="en">
+  <h1>TheFeed — Privacy Policy</h1>
+  <p class="updated">Last updated: 2026-11-05</p>
+
+  <h2>Summary</h2>
+  <p>
+    TheFeed does not collect, store, sell, or transmit any personal information
+    to its developers or to any third party. Everything stays on your device or
+    on a server you choose to connect to.
+  </p>
+
+  <h2>What we collect</h2>
+  <p>
+    <strong>Nothing.</strong> The app has no analytics, no crash reporters, no
+    advertising SDKs, and no telemetry. The developers cannot see your usage,
+    your messages, your channels, your saved files, or any other data.
+  </p>
+
+  <h2>Data on your device</h2>
+  <p>
+    The app stores the following on your device only, inside its own sandboxed
+    storage area:
+  </p>
+  <ul>
+    <li>Server profiles you create (domain, passphrase, settings).</li>
+    <li>Cached messages and media downloaded from servers you connect to.</li>
+    <li>Resolver lists and the per-resolver health scoreboard.</li>
+    <li>Your interface language preference.</li>
+    <li>If you use the optional <strong>Messenger</strong>: your recovery code (the secret that controls your messenger identity), your conversation history, and the contact names you assign. Contact names never leave your device.</li>
+  </ul>
+  <p>
+    All of this is removed when you delete the app from your device.
+  </p>
+
+  <h2>Messenger (optional)</h2>
+  <p>
+    The app includes an optional messenger. It is end-to-end encrypted: only
+    you and the person you are talking to can read a message. The server that
+    relays it — including the default server we operate, and any other server you
+    choose to use — only ever holds an <strong>unreadable, encrypted blob</strong>
+    until the recipient picks it up, and at most for a few days before it is
+    automatically deleted.
+  </p>
+  <ul>
+    <li>Neither we nor any server operator can read your messages or your contact names: the message contents are end-to-end encrypted, and contact names never leave your device.</li>
+    <li>To route a message, the relaying server (including our default server) necessarily sees <strong>which address sends to which address</strong> and the delivery timing. It never sees the message text or your contact names.</li>
+    <li>Your messenger identity is generated on your device from a recovery code that also stays on your device. Your "address" is a pseudonym derived from it — not linked to your name, phone, or email — and is the only thing you share to be reachable.</li>
+    <li>The messenger is off unless you open it, and you can point the app at a different server at any time.</li>
+  </ul>
+
+  <h2>Telegram (optional)</h2>
+  <p>
+    The app includes an optional, unofficial Telegram client. It is not made,
+    affiliated with or endorsed by Telegram. If you choose to use it:
+  </p>
+  <ul>
+    <li>You sign in to your own Telegram account with Telegram's own login. Your phone number and the login code go to Telegram, encrypted with Telegram's own protocol (MTProto). We never see them.</li>
+    <li>This traffic is carried over DNS through the server of the config you use (including our default server). That server only passes on encrypted data that it cannot read; it sees the timing and size of the traffic, not your chats, contacts or phone number.</li>
+    <li>Your Telegram login session and the chats you open are stored on your device only. You can lock the section with a passcode. Signing out deletes the session from your device.</li>
+    <li>Telegram's own privacy policy applies to your Telegram account: <a href="https://telegram.org/privacy">telegram.org/privacy</a>.</li>
+  </ul>
+
+  <h2>Network connections</h2>
+  <p>
+    The app makes outbound network connections to:
+  </p>
+  <ul>
+    <li>DNS resolvers you or the developer of your selected server have configured.</li>
+    <li>The HTTPS endpoint of any optional relay (for example, the GitHub HTTPS API for the optional fast-relay download path).</li>
+    <li>Public Telegram channel preview pages, fetched through Google's Translate web proxy, when the optional channel-browse feature is enabled by the user.</li>
+  </ul>
+  <p>
+    These connections are made directly between your device and the chosen
+    third party. The app developers operate no central server and have no
+    access to the contents of those connections.
+  </p>
+
+  <h2>Permissions</h2>
+  <ul>
+    <li><strong>Notifications</strong> — to alert you to new posts and messages.</li>
+    <li><strong>Saving downloads</strong> — only when you choose to save a downloaded image or video, the app writes it to your device's gallery or storage.</li>
+    <li><strong>Foreground service (Android)</strong> — keeps the app fetching and delivering while you are using it.</li>
+    <li><strong>Local network</strong> — the app talks only to its own embedded server on <code>127.0.0.1</code>, which does not require system permission. The app does not scan your local network.</li>
+  </ul>
+  <p>The app does <strong>not</strong> access your camera, microphone, contacts, location, SMS, or call logs.</p>
+
+  <h2>Children's privacy</h2>
+  <p>
+    The app is not directed at children under 13 and does not knowingly collect
+    information from them.
+  </p>
+
+  <h2>Changes</h2>
+  <p>
+    If this policy changes, the updated version will be posted at this URL.
+    The "Last updated" date above will reflect the change.
+  </p>
+
+  <h2>Contact</h2>
+  <p>
+    For questions, open an issue at
+    <a href="https://github.com/sartoopjj/thefeed/issues">github.com/sartoopjj/thefeed</a>.
+  </p>
+</section>
+
+<section id="fa" hidden dir="rtl">
+  <h1>TheFeed — حریم خصوصی</h1>
+  <p class="updated">آخرین به‌روزرسانی: ۲۰۲۶/۱۱/۰۵</p>
+
+  <h2>خلاصه</h2>
+  <p>
+    این برنامه هیچ اطلاعات شخصی‌ای را جمع‌آوری، ذخیره، فروش یا به سرور
+    سازنده ارسال نمی‌کند. تمام داده‌ها روی دستگاه شما یا روی سروری که خودتان
+    انتخاب می‌کنید باقی می‌ماند.
+  </p>
+
+  <h2>چه چیزی جمع‌آوری می‌کنیم</h2>
+  <p>
+    <strong>هیچ چیز.</strong> این برنامه هیچ سرویس آنالیتیکس، گزارش کرش،
+    تبلیغات یا تله‌متری ندارد. سازنده‌ی برنامه به استفاده، پیام‌ها، کانال‌ها،
+    فایل‌های ذخیره‌شده یا هیچ داده‌ی دیگری از شما دسترسی ندارد.
+  </p>
+
+  <h2>داده‌های روی دستگاه</h2>
+  <p>
+    برنامه فقط روی فضای ذخیره‌سازی محلی خود این داده‌ها را نگه می‌دارد:
+  </p>
+  <ul>
+    <li>پروفایل سرورهایی که می‌سازید (دامنه، رمز، تنظیمات).</li>
+    <li>پیام‌ها و رسانه‌های دانلود‌شده از سرور انتخابی.</li>
+    <li>لیست ریزالورها و امتیازهای سلامتی هرکدام.</li>
+    <li>زبان رابط کاربری انتخابی شما.</li>
+    <li>اگر از <strong>پیام‌رسان</strong> اختیاری استفاده کنید: کد بازیابی شما (رمزی که هویت پیام‌رسان شما را کنترل می‌کند)، تاریخچه‌ی گفتگوها و نام‌هایی که برای مخاطبان می‌گذارید. نام مخاطبان هرگز از دستگاه شما خارج نمی‌شود.</li>
+  </ul>
+  <p>با حذف برنامه از دستگاه، همه‌ی این داده‌ها هم پاک می‌شود.</p>
+
+  <h2>پیام‌رسان (اختیاری)</h2>
+  <p>
+    برنامه یک پیام‌رسان اختیاری دارد. این پیام‌رسان رمزنگاری سرتاسری دارد: فقط
+    شما و طرف مقابل می‌توانید پیام را بخوانید. سروری که پیام را منتقل می‌کند —
+    از جمله سرور پیش‌فرضی که ما اداره می‌کنیم و هر سرور دیگری که خودتان انتخاب کنید —
+    فقط یک <strong>بسته‌ی رمزشده و غیرقابل‌خواندن</strong> را تا زمانی که گیرنده
+    آن را دریافت کند نگه می‌دارد و حداکثر چند روز، سپس به‌صورت خودکار پاک می‌شود.
+  </p>
+  <ul>
+    <li>نه ما و نه هیچ گرداننده‌ی سروری نمی‌تواند پیام‌ها یا نام مخاطبان شما را بخواند: متن پیام‌ها رمزنگاری سرتاسری است و نام مخاطبان هرگز از دستگاه شما خارج نمی‌شود.</li>
+    <li>برای مسیریابی پیام، سرور منتقل‌کننده (از جمله سرور پیش‌فرض ما) ناگزیر می‌بیند که <strong>کدام آدرس به کدام آدرس</strong> پیام می‌فرستد و زمان تحویل را می‌داند. اما هرگز متن پیام یا نام مخاطبان شما را نمی‌بیند.</li>
+    <li>هویت پیام‌رسان شما روی دستگاهتان از یک کد بازیابی ساخته می‌شود که آن هم روی دستگاه می‌ماند. «آدرس» شما یک نام مستعار مشتق‌شده از آن است — به نام، شماره تلفن یا ایمیل شما وصل نیست — و تنها چیزی است که برای در دسترس بودن به اشتراک می‌گذارید.</li>
+    <li>پیام‌رسان تا وقتی آن را باز نکنید خاموش است و هر زمان می‌توانید برنامه را به سرور دیگری وصل کنید.</li>
+  </ul>
+
+  <h2>تلگرام (اختیاری)</h2>
+  <p>
+    برنامه یک کلاینت غیررسمی و اختیاری تلگرام دارد که ساخت تلگرام نیست و با آن
+    ارتباطی ندارد. اگر از آن استفاده کنید:
+  </p>
+  <ul>
+    <li>با ورود خود تلگرام وارد حساب تلگرام خودتان می‌شوید. شماره تلفن و کد ورود با پروتکل رمزنگاری خود تلگرام (MTProto) به تلگرام می‌رسد و ما هرگز آن‌ها را نمی‌بینیم.</li>
+    <li>این ترافیک از طریق DNS و سرورِ کانفیگی که استفاده می‌کنید (از جمله سرور پیش‌فرض ما) منتقل می‌شود. آن سرور فقط داده‌ی رمزشده‌ای را که نمی‌تواند بخواند جابه‌جا می‌کند؛ زمان و حجم ترافیک را می‌بیند، نه گفتگوها، مخاطبان یا شماره تلفن شما را.</li>
+    <li>نشست ورود تلگرام و گفتگوهایی که باز می‌کنید فقط روی دستگاه شما ذخیره می‌شوند. می‌توانید این بخش را با رمز قفل کنید. با خروج از حساب، نشست از دستگاه پاک می‌شود.</li>
+    <li>برای حساب تلگرام، سیاست حریم خصوصی خود تلگرام برقرار است: <a href="https://telegram.org/privacy">telegram.org/privacy</a>.</li>
+  </ul>
+
+  <h2>اتصال به شبکه</h2>
+  <p>برنامه به این موارد متصل می‌شود:</p>
+  <ul>
+    <li>ریزالورهای DNS که شما یا سازنده‌ی سرور انتخابی پیکربندی کرده‌اید.</li>
+    <li>HTTPS رله‌های اختیاری (مثلاً GitHub برای مسیر دانلود سریع اختیاری).</li>
+    <li>صفحات پیش‌نمایش کانال‌های عمومی تلگرام از طریق پروکسی وب گوگل ترنسلیت — فقط وقتی کاربر این قابلیت اختیاری را فعال کند.</li>
+  </ul>
+  <p>
+    این اتصال‌ها مستقیماً بین دستگاه شما و طرف سوم برقرار می‌شوند. سازنده
+    سرور مرکزی ندارد و به محتوای این اتصال‌ها دسترسی ندارد.
+  </p>
+
+  <h2>مجوزها</h2>
+  <ul>
+    <li><strong>اعلان‌ها</strong> — برای اطلاع‌رسانی پست‌ها و پیام‌های جدید.</li>
+    <li><strong>ذخیره‌ی دانلودها</strong> — فقط وقتی خودتان تصمیم به ذخیره‌ی عکس یا ویدیوی دانلودشده بگیرید، برنامه آن را در گالری یا حافظه‌ی دستگاه می‌نویسد.</li>
+    <li><strong>سرویس پیش‌زمینه (اندروید)</strong> — تا وقتی از برنامه استفاده می‌کنید، دریافت و تحویل پیام‌ها را ادامه می‌دهد.</li>
+    <li><strong>شبکه‌ی محلی</strong> — برنامه فقط با سرور داخلی روی <code>127.0.0.1</code> کار می‌کند که به مجوز سیستمی نیاز ندارد و شبکه‌ی محلی شما را اسکن نمی‌کند.</li>
+  </ul>
+  <p>برنامه به دوربین، میکروفون، مخاطبان، موقعیت مکانی، پیامک یا گزارش تماس‌های شما دسترسی <strong>ندارد</strong>.</p>
+
+  <h2>کودکان</h2>
+  <p>این برنامه برای کودکان زیر ۱۳ سال طراحی نشده.</p>
+
+  <h2>تغییرات</h2>
+  <p>هر تغییری در این متن، در همین آدرس منتشر می‌شود.</p>
+
+  <h2>تماس</h2>
+  <p>
+    برای سؤال یا گزارش مشکل:
+    <a href="https://github.com/sartoopjj/thefeed/issues">github.com/sartoopjj/thefeed</a>
+  </p>
+</section>
+
+<script>
+  function show(lang) {
+    document.getElementById('en').hidden = (lang !== 'en');
+    document.getElementById('fa').hidden = (lang !== 'fa');
+    document.documentElement.lang = lang;
+  }
+  // Auto-pick on load.
+  if ((navigator.language || '').toLowerCase().startsWith('fa')) show('fa');
+</script>
+
+</body>
+</html>

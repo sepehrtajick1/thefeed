@@ -1,0 +1,148 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    namespace 'com.thefeed.android'
+    compileSdk 36
+
+    defaultConfig {
+        applicationId 'com.thefeed.android'
+        // minSdk is NOT what the store requires. Google Play's rule is on the
+        // TARGET level only, so this stays where it is and the same APK keeps
+        // installing on Android 7 and up -- store build and GitHub build alike.
+        minSdk 24
+        targetSdk 36
+        // versionCode auto-increments from git commit count so each build can be installed over the previous one.
+        // CI can override it with -PversionCode=<n> so the uploaded code strictly
+        // increases even on a shallow clone where the commit count would be wrong.
+        // Local/GitHub builds keep the git fallback.
+        versionCode = { ->
+            def override = project.findProperty('versionCode')
+            if (override) return override.toString().toInteger()
+            try {
+                return "git rev-list --count HEAD".execute([], rootDir).text.trim().toInteger()
+            } catch (ignored) {
+                return 1
+            }
+        }()
+        versionName = { ->
+            def override = project.findProperty('versionName')
+            if (override) return override.toString()
+            try {
+                def tag = "git describe --tags --always --dirty".execute([], rootDir).text.trim()
+                return tag ?: "dev"
+            } catch (ignored) {
+                return "dev"
+            }
+        }()
+
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+
+        // Propagate the universal-build flag to runtime code. After
+        // install Android extracts only one ABI's .so regardless of
+        // whether the source APK was per-arch or universal, so we
+        // can't tell at runtime — the flag has to be baked in here.
+        // Drives which release asset the in-app update prompt links to.
+        buildConfigField "boolean", "IS_UNIVERSAL",
+            project.hasProperty('universalBuild') ? "true" : "false"
+
+        // Disables the in-app updater (see NewAndroidPlayServer). The
+        // 'bundle' check is the safety net for a forgotten -PplayBuild: an
+        // .aab is only ever produced for a store.
+        buildConfigField "boolean", "IS_PLAY_BUILD",
+            (project.hasProperty('playBuild') ||
+             gradle.startParameter.taskNames.any { it.toLowerCase().contains('bundle') })
+                ? "true" : "false"
+    }
+
+    buildFeatures {
+        // AGP 8 disables BuildConfig generation by default.
+        buildConfig true
+    }
+
+    signingConfigs {
+        // Release signing credentials come ONLY from the environment — never
+        // hardcoded in source. CI (GitHub/GitLab/Codemagic) sets KEYSTORE_PASSWORD
+        // / KEY_ALIAS / KEY_PASSWORD; for local release builds put them in a
+        // gitignored android/keystore.properties (storePassword/keyAlias/keyPassword).
+        // Missing keystore or credentials falls back to debug signing — the
+        // "android" password below is Google's universal public debug password,
+        // not a secret.
+        release {
+            def ksFile = file("keystore.jks")
+            def props = new Properties()
+            def propsFile = rootProject.file("keystore.properties")
+            if (propsFile.exists()) { propsFile.withInputStream { props.load(it) } }
+            def storePw = System.getenv("KEYSTORE_PASSWORD") ?: props.getProperty("storePassword")
+            def alias   = System.getenv("KEY_ALIAS")         ?: props.getProperty("keyAlias")
+            def keyPw   = System.getenv("KEY_PASSWORD")      ?: props.getProperty("keyPassword")
+            if (ksFile.exists() && storePw && alias && keyPw) {
+                storeFile ksFile
+                storePassword storePw
+                keyAlias alias
+                keyPassword keyPw
+            } else {
+                def debugKs = new File(System.getProperty("user.home"), ".android/debug.keystore")
+                storeFile debugKs
+                storePassword "android"
+                keyAlias "androiddebugkey"
+                keyPassword "android"
+            }
+        }
+    }
+
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.release
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+    }
+
+    // Build mode controlled by a gradle property:
+    //   ./gradlew assembleRelease                       → 4 per-ABI split APKs
+    //   ./gradlew -PuniversalBuild=true assembleRelease → 1 universal APK
+    //
+    // The universal bundles all 4 ABIs so even older 32-bit Intel
+    // devices install cleanly. Stripped libgojni.so is small enough
+    // (~5–6 MB per ABI) that a 4-ABI universal stays around 22–24 MB.
+    splits {
+        abi {
+            enable !project.hasProperty('universalBuild')
+            reset()
+            include 'arm64-v8a', 'armeabi-v7a', 'x86', 'x86_64'
+            universalApk false
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+}
+
+dependencies {
+    implementation 'androidx.core:core-ktx:1.15.0'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'com.google.android.material:material:1.12.0'
+    implementation 'androidx.activity:activity-ktx:1.10.1'
+
+    // gomobile-generated bindings: in-process Go HTTP server. The .aar
+    // is produced by `make android-bind` (gomobile bind -target=android
+    // -o android/app/libs/mobile.aar ./mobile) and resolved via the
+    // flatDir declared in settings.gradle. Loaded via System.loadLibrary,
+    // which works on all Android versions including 16 KB-page devices,
+    // SELinux-strict custom ROMs, and devices that block exec from
+    // nativeLibraryDir — situations that broke the old subprocess
+    // approach.
+    implementation(name: 'mobile', ext: 'aar')
+}

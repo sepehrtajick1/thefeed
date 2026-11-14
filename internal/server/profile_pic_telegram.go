@@ -1,0 +1,149 @@
+package server
+
+import (
+	"context"
+	"fmt"
+	"log"
+	"strings"
+
+	"github.com/gotd/td/tg"
+)
+
+// extractChatPhotoID returns (photoID, dcID), or (0, 0) when there is none.
+func extractChatPhotoID(p tg.ChatPhotoClass) (int64, int) {
+	switch ph := p.(type) {
+	case *tg.ChatPhoto:
+		return ph.PhotoID, ph.DCID
+	}
+	return 0, 0
+}
+
+// extractUserPhotoID is the User-profile equivalent.
+func extractUserPhotoID(p tg.UserProfilePhotoClass) (int64, int) {
+	switch ph := p.(type) {
+	case *tg.UserProfilePhoto:
+		return ph.PhotoID, ph.DCID
+	}
+	return 0, 0
+}
+
+// fetchProfilePhoto downloads the small (~5KB / 160px) thumb. Big:false
+// is Telegram's "a" thumb size.
+func (tr *TelegramReader) fetchProfilePhoto(ctx context.Context, api *tg.Client, peer tg.InputPeerClass, photoID int64) ([]byte, error) {
+	if photoID == 0 {
+		return nil, fmt.Errorf("no photo")
+	}
+	loc := &tg.InputPeerPhotoFileLocation{
+		Peer:    peer,
+		PhotoID: photoID,
+	}
+	loc.Big = false
+	return tr.downloadTelegramFile(ctx, api, loc, 0)
+}
+
+// fetchAllProfilePhotos downloads avatars (public by username,
+// private by privateChannelID) and merges them into the feed bundle.
+// Per-channel failures are logged and skipped.
+func (tr *TelegramReader) fetchAllProfilePhotos(ctx context.Context, api *tg.Client) {
+	totalSlots := len(tr.channels)
+	if tr.privates != nil {
+		totalSlots += len(tr.privates.ordered)
+	}
+	pics := make(map[string][]byte, totalSlots)
+	// Every channel in the lists, fetched or not this time: what is missing
+	// from it has been removed, and its avatar goes with it.
+	current := make(map[string]bool, totalSlots)
+
+	// Public channels.
+	for _, username := range tr.channels {
+		if ctx.Err() != nil {
+			return
+		}
+		username = strings.TrimSpace(username)
+		if username == "" {
+			continue
+		}
+		current[username] = true
+		rp, err := tr.resolvePeer(ctx, api, username)
+		if err != nil {
+			log.Printf("[profile-pics] resolve %s: %v", username, err)
+			continue
+		}
+		if rp.photoID == 0 {
+			// The photo was taken down: so is ours.
+			pics[username] = nil
+			continue
+		}
+		// Skip the download if we already pushed this photoID.
+		tr.mu.Lock()
+		if tr.lastPhotoID == nil {
+			tr.lastPhotoID = map[string]int64{}
+		}
+		prevID, hadPrev := tr.lastPhotoID[username]
+		tr.mu.Unlock()
+		if hadPrev && prevID == rp.photoID {
+			continue
+		}
+		body, err := tr.fetchProfilePhoto(ctx, api, rp.peer, rp.photoID)
+		if err != nil {
+			log.Printf("[profile-pics] download %s (id=%d): %v", username, rp.photoID, err)
+			continue
+		}
+		pics[username] = body
+		tr.mu.Lock()
+		tr.lastPhotoID[username] = rp.photoID
+		tr.mu.Unlock()
+	}
+
+	// Private channels — keyed by privateChannelID to match the Feed
+	// Name.
+	if tr.privates != nil {
+		for _, hash := range tr.privates.ordered {
+			if ctx.Err() != nil {
+				return
+			}
+			key := privateChannelID(hash)
+			current[key] = true
+			rp, ok := tr.privates.get(hash)
+			if !ok {
+				continue
+			}
+			if rp.photoID == 0 {
+				pics[key] = nil
+				continue
+			}
+			tr.mu.Lock()
+			if tr.lastPhotoID == nil {
+				tr.lastPhotoID = map[string]int64{}
+			}
+			prevID, hadPrev := tr.lastPhotoID[key]
+			tr.mu.Unlock()
+			if hadPrev && prevID == rp.photoID {
+				continue
+			}
+			body, err := tr.fetchProfilePhoto(ctx, api, rp.peer, rp.photoID)
+			if err != nil {
+				log.Printf("[profile-pics] download private %s (id=%d): %v", rp.title, rp.photoID, err)
+				continue
+			}
+			pics[key] = body
+			tr.mu.Lock()
+			tr.lastPhotoID[key] = rp.photoID
+			tr.mu.Unlock()
+		}
+	}
+
+	// Merged, so other readers' entries (X's "x:") survive.
+	total, dropped := tr.feed.RefreshProfilePics(pics, current, false)
+	if len(dropped) > 0 {
+		// Gone from the bundle: fetch again if the channel comes back.
+		tr.mu.Lock()
+		for _, k := range dropped {
+			delete(tr.lastPhotoID, k)
+		}
+		tr.mu.Unlock()
+	}
+	if len(pics) > 0 || len(dropped) > 0 {
+		log.Printf("[profile-pics] cycle done: %d changed, %d dropped, %d total in bundle", len(pics), len(dropped), total)
+	}
+}

@@ -1,0 +1,490 @@
+package web
+
+import (
+	"os/exec"
+	"testing"
+)
+
+// TestJSI18NCoverage runs the node checks over i18n.js: every t('key') used in
+// the frontend must exist in every language table. t() falls back to the key
+// itself, so a missing one renders as raw text (the update dialog shipped
+// showing a literal "update_downloading"). Skipped when node isn't installed.
+func TestJSI18NCoverage(t *testing.T) {
+	node, err := exec.LookPath("node")
+	if err != nil {
+		t.Skip("node not installed")
+	}
+	out, err := exec.Command(node, "jstest/i18n.test.mjs").CombinedOutput()
+	if err != nil {
+		t.Fatalf("i18n coverage failed:\n%s", out)
+	}
+	t.Logf("%s", out)
+}
+
+// A Telegram message comes from whoever chose to send one, so nothing in it
+// may become code. Run with the rest of the suite, not by hand.
+func TestJSTelegramXSS(t *testing.T) {
+	node, err := exec.LookPath("node")
+	if err != nil {
+		t.Skip("node not installed")
+	}
+	out, err := exec.Command(node, "jstest/tel_xss.test.mjs").CombinedOutput()
+	if err != nil {
+		t.Fatalf("telegram XSS checks failed:\n%s", out)
+	}
+	t.Logf("%s", out)
+}
+
+// The reaction a user sees the instant they tap, before Telegram answers. A
+// wrong guess here shows a count that is simply untrue. Run with the rest of
+// the suite, not by hand.
+func TestJSTelegramReactions(t *testing.T) {
+	node, err := exec.LookPath("node")
+	if err != nil {
+		t.Skip("node not installed")
+	}
+	out, err := exec.Command(node, "jstest/tel_react.test.mjs").CombinedOutput()
+	if err != nil {
+		t.Fatalf("reaction count checks failed:\n%s", out)
+	}
+	t.Logf("%s", out)
+}
+
+// Message order after a send settles from the send's own answer. Run with the
+// rest of the suite, not by hand.
+func TestJSTelegramSendOrder(t *testing.T) {
+	node, err := exec.LookPath("node")
+	if err != nil {
+		t.Skip("node not installed")
+	}
+	out, err := exec.Command(node, "jstest/tel_order.test.mjs").CombinedOutput()
+	if err != nil {
+		t.Fatalf("send order checks failed:\n%s", out)
+	}
+	t.Logf("%s", out)
+}
+
+// Which messages a counter refresh asks about: a cost decision as much as a
+// correctness one, since every id costs bytes in the answer. Run with the rest
+// of the suite, not by hand.
+func TestJSTelegramStatsSelection(t *testing.T) {
+	node, err := exec.LookPath("node")
+	if err != nil {
+		t.Skip("node not installed")
+	}
+	out, err := exec.Command(node, "jstest/tel_stats.test.mjs").CombinedOutput()
+	if err != nil {
+		t.Fatalf("stats selection checks failed:\n%s", out)
+	}
+	t.Logf("%s", out)
+}
+
+// Where the "new messages" line goes, and that it stays put while someone is
+// reading it. Run with the rest of the suite, not by hand.
+func TestJSTelegramNewMessageLine(t *testing.T) {
+	node, err := exec.LookPath("node")
+	if err != nil {
+		t.Skip("node not installed")
+	}
+	out, err := exec.Command(node, "jstest/tel_newsep.test.mjs").CombinedOutput()
+	if err != nil {
+		t.Fatalf("new-messages line checks failed:\n%s", out)
+	}
+	t.Logf("%s", out)
+}
+
+// Fetching the rest of a long conversation list: the background pager has to
+// be armed on a normal start, not only on signing in. Run with the suite.
+func TestJSTelegramDialogPaging(t *testing.T) {
+	node, err := exec.LookPath("node")
+	if err != nil {
+		t.Skip("node not installed")
+	}
+	out, err := exec.Command(node, "jstest/tel_paging.test.mjs").CombinedOutput()
+	if err != nil {
+		t.Fatalf("dialog paging checks failed:\n%s", out)
+	}
+	t.Logf("%s", out)
+}
+
+// Every cache the backend reports must have a label, an icon and a colour on
+// the storage screen. Run with the rest of the suite, not by hand.
+func TestJSStorageRowsAreComplete(t *testing.T) {
+	node, err := exec.LookPath("node")
+	if err != nil {
+		t.Skip("node not installed")
+	}
+	out, err := exec.Command(node, "jstest/storage_rows.test.mjs").CombinedOutput()
+	if err != nil {
+		t.Fatalf("storage row checks failed:\n%s", out)
+	}
+	t.Logf("%s", out)
+}
+
+// What the progress strip says once every cell has been sent and the answer is
+// still coming back. Run with the rest of the suite, not by hand.
+func TestJSTelegramProgressLabel(t *testing.T) {
+	node, err := exec.LookPath("node")
+	if err != nil {
+		t.Skip("node not installed")
+	}
+	out, err := exec.Command(node, "jstest/tel_progress.test.mjs").CombinedOutput()
+	if err != nil {
+		t.Fatalf("progress label checks failed:\n%s", out)
+	}
+	t.Logf("%s", out)
+}
+
+// Signing out must not take the operation lock, or pressing it during a fetch
+// does nothing. Run with the rest of the suite, not by hand.
+func TestJSTelegramLogout(t *testing.T) {
+	node, err := exec.LookPath("node")
+	if err != nil {
+		t.Skip("node not installed")
+	}
+	out, err := exec.Command(node, "jstest/tel_logout.test.mjs").CombinedOutput()
+	if err != nil {
+		t.Fatalf("logout checks failed:\n%s", out)
+	}
+	t.Logf("%s", out)
+}
+
+// Every field the backend sends on a conversation row must be taken when the
+// row is refreshed. Run with the rest of the suite, not by hand.
+func TestJSTelegramDialogFieldsRefresh(t *testing.T) {
+	node, err := exec.LookPath("node")
+	if err != nil {
+		t.Skip("node not installed")
+	}
+	out, err := exec.Command(node, "jstest/tel_dialog_fields.test.mjs").CombinedOutput()
+	if err != nil {
+		t.Fatalf("dialog field checks failed:\n%s", out)
+	}
+	t.Logf("%s", out)
+}
+
+// The progress strip must not move the lists when it comes and goes. Run with
+// the rest of the suite, not by hand.
+func TestJSTelegramProgressDoesNotJump(t *testing.T) {
+	node, err := exec.LookPath("node")
+	if err != nil {
+		t.Skip("node not installed")
+	}
+	out, err := exec.Command(node, "jstest/tel_nojump.test.mjs").CombinedOutput()
+	if err != nil {
+		t.Fatalf("progress jump checks failed:\n%s", out)
+	}
+	t.Logf("%s", out)
+}
+
+// Telegram's own formatting must render, and must not become markup. Run
+// with the rest of the suite, not by hand.
+func TestJSTelegramEntities(t *testing.T) {
+	node, err := exec.LookPath("node")
+	if err != nil {
+		t.Skip("node not installed")
+	}
+	out, err := exec.Command(node, "jstest/tel_entities.test.mjs").CombinedOutput()
+	if err != nil {
+		t.Fatalf("entity rendering checks failed:\n%s", out)
+	}
+	t.Logf("%s", out)
+}
+
+// A value in an inline handler must be escaped for JAVASCRIPT. Run with the
+// rest of the suite, not by hand.
+func TestJSInlineHandlerEscaping(t *testing.T) {
+	node, err := exec.LookPath("node")
+	if err != nil {
+		t.Skip("node not installed")
+	}
+	out, err := exec.Command(node, "jstest/inline_handler_escaping.test.mjs").CombinedOutput()
+	if err != nil {
+		t.Fatalf("inline handler escaping checks failed:\n%s", out)
+	}
+	t.Logf("%s", out)
+}
+
+// A muted conversation must look muted. Run with the rest of the suite, not
+// by hand.
+func TestJSTelegramMutedRow(t *testing.T) {
+	node, err := exec.LookPath("node")
+	if err != nil {
+		t.Skip("node not installed")
+	}
+	out, err := exec.Command(node, "jstest/tel_muted_row.test.mjs").CombinedOutput()
+	if err != nil {
+		t.Fatalf("muted row checks failed:\n%s", out)
+	}
+	t.Logf("%s", out)
+}
+
+// Each ⟳ must refresh the thing it sits on. Run with the rest of the suite,
+// not by hand.
+func TestJSTelegramRefreshTarget(t *testing.T) {
+	node, err := exec.LookPath("node")
+	if err != nil {
+		t.Skip("node not installed")
+	}
+	out, err := exec.Command(node, "jstest/tel_refresh_target.test.mjs").CombinedOutput()
+	if err != nil {
+		t.Fatalf("refresh target checks failed:\n%s", out)
+	}
+	t.Logf("%s", out)
+}
+
+// The progress strip must not strobe when operations are fast. Run with the
+// rest of the suite, not by hand.
+func TestJSTelegramProgressHold(t *testing.T) {
+	node, err := exec.LookPath("node")
+	if err != nil {
+		t.Skip("node not installed")
+	}
+	out, err := exec.Command(node, "jstest/tel_prog_hold.test.mjs").CombinedOutput()
+	if err != nil {
+		t.Fatalf("progress hold checks failed:\n%s", out)
+	}
+	t.Logf("%s", out)
+}
+
+// ✓ must be able to become ✓✓ on its own. Run with the rest of the suite, not
+// by hand.
+func TestJSChatDeliveryTicks(t *testing.T) {
+	node, err := exec.LookPath("node")
+	if err != nil {
+		t.Skip("node not installed")
+	}
+	out, err := exec.Command(node, "jstest/chat_ticks.test.mjs").CombinedOutput()
+	if err != nil {
+		t.Fatalf("chat tick checks failed:\n%s", out)
+	}
+	t.Logf("%s", out)
+}
+
+// Every chat server sets its own limits and counts its own sends, so the
+// numbers shown must be those of the server the conversation uses.
+func TestJSChatLimitsPerServer(t *testing.T) {
+	node, err := exec.LookPath("node")
+	if err != nil {
+		t.Skip("node not installed")
+	}
+	out, err := exec.Command(node, "jstest/chat_limits.test.mjs").CombinedOutput()
+	if err != nil {
+		t.Fatalf("chat limits failed:\n%s", out)
+	}
+	t.Logf("%s", out)
+}
+
+// Typing in a Telegram conversation must survive round trips starting and
+// ending around it.
+func TestJSTelComposerSurvivesRenders(t *testing.T) {
+	node, err := exec.LookPath("node")
+	if err != nil {
+		t.Skip("node not installed")
+	}
+	out, err := exec.Command(node, "jstest/tel_composer.test.mjs").CombinedOutput()
+	if err != nil {
+		t.Fatalf("tel composer failed:\n%s", out)
+	}
+	t.Logf("%s", out)
+}
+
+// Every message Telegram has must reach the conversation, whatever we sent in
+// between, and an edit must replace the text already on screen.
+func TestJSTelNoGapsAndEdits(t *testing.T) {
+	node, err := exec.LookPath("node")
+	if err != nil {
+		t.Skip("node not installed")
+	}
+	out, err := exec.Command(node, "jstest/tel_gaps.test.mjs").CombinedOutput()
+	if err != nil {
+		t.Fatalf("tel gaps failed:\n%s", out)
+	}
+	t.Logf("%s", out)
+}
+
+// Every Tel request must send its payload, not request options wrapped as one.
+func TestJSTelCallsSendTheirPayload(t *testing.T) {
+	node, err := exec.LookPath("node")
+	if err != nil {
+		t.Skip("node not installed")
+	}
+	out, err := exec.Command(node, "jstest/tel_calls.test.mjs").CombinedOutput()
+	if err != nil {
+		t.Fatalf("tel calls failed:\n%s", out)
+	}
+	t.Logf("%s", out)
+}
+
+// Telegram's ads must be shown, marked as ads, and never hold the link.
+func TestJSTelSponsoredMessages(t *testing.T) {
+	node, err := exec.LookPath("node")
+	if err != nil {
+		t.Skip("node not installed")
+	}
+	out, err := exec.Command(node, "jstest/tel_ads.test.mjs").CombinedOutput()
+	if err != nil {
+		t.Fatalf("tel ads failed:\n%s", out)
+	}
+	t.Logf("%s", out)
+}
+
+// Tapping a message must offer Reply, and the send must go out as an answer.
+func TestJSTelReply(t *testing.T) {
+	node, err := exec.LookPath("node")
+	if err != nil {
+		t.Skip("node not installed")
+	}
+	out, err := exec.Command(node, "jstest/tel_reply.test.mjs").CombinedOutput()
+	if err != nil {
+		t.Fatalf("tel reply failed:\n%s", out)
+	}
+	t.Logf("%s", out)
+}
+
+// Deleted and self-destructed messages must leave the open conversation.
+func TestJSTelDeletes(t *testing.T) {
+	node, err := exec.LookPath("node")
+	if err != nil {
+		t.Skip("node not installed")
+	}
+	out, err := exec.Command(node, "jstest/tel_deletes.test.mjs").CombinedOutput()
+	if err != nil {
+		t.Fatalf("tel deletes failed:\n%s", out)
+	}
+	t.Logf("%s", out)
+}
+
+// Online status and typing must be reported, cheaply.
+func TestJSTelPresence(t *testing.T) {
+	node, err := exec.LookPath("node")
+	if err != nil {
+		t.Skip("node not installed")
+	}
+	out, err := exec.Command(node, "jstest/tel_presence.test.mjs").CombinedOutput()
+	if err != nil {
+		t.Fatalf("tel presence failed:\n%s", out)
+	}
+	t.Logf("%s", out)
+}
+
+// Direct messages to a channel's admins: button, one call, nothing paid.
+func TestJSTelDirect(t *testing.T) {
+	node, err := exec.LookPath("node")
+	if err != nil {
+		t.Skip("node not installed")
+	}
+	out, err := exec.Command(node, "jstest/tel_direct.test.mjs").CombinedOutput()
+	if err != nil {
+		t.Fatalf("tel direct failed:\n%s", out)
+	}
+	t.Logf("%s", out)
+}
+
+// The ⋮ on every message: edit our own, delete where Telegram can.
+func TestJSTelMessageActions(t *testing.T) {
+	node, err := exec.LookPath("node")
+	if err != nil {
+		t.Skip("node not installed")
+	}
+	out, err := exec.Command(node, "jstest/tel_msgactions.test.mjs").CombinedOutput()
+	if err != nil {
+		t.Fatalf("tel message actions failed:\n%s", out)
+	}
+	t.Logf("%s", out)
+}
+
+// Searching the posts of the open Mirror channel.
+func TestJSMirrorSearch(t *testing.T) {
+	node, err := exec.LookPath("node")
+	if err != nil {
+		t.Skip("node not installed")
+	}
+	out, err := exec.Command(node, "jstest/tm_search.test.mjs").CombinedOutput()
+	if err != nil {
+		t.Fatalf("mirror search failed:\n%s", out)
+	}
+	t.Logf("%s", out)
+}
+
+// Forwarding: the ⋮ item, the picker and its options, the call, the header.
+func TestJSTelForward(t *testing.T) {
+	node, err := exec.LookPath("node")
+	if err != nil {
+		t.Skip("node not installed")
+	}
+	out, err := exec.Command(node, "jstest/tel_forward.test.mjs").CombinedOutput()
+	if err != nil {
+		t.Fatalf("forward failed:\n%s", out)
+	}
+	t.Logf("%s", out)
+}
+
+// Switching the Telegram config while one is live.
+func TestJSTelSwitch(t *testing.T) {
+	node, err := exec.LookPath("node")
+	if err != nil {
+		t.Skip("node not installed")
+	}
+	out, err := exec.Command(node, "jstest/tel_switch.test.mjs").CombinedOutput()
+	if err != nil {
+		t.Fatalf("switch failed:\n%s", out)
+	}
+	t.Logf("%s", out)
+}
+
+// The Telegram intro is remembered on the backend, across ports.
+func TestJSTelIntro(t *testing.T) {
+	node, err := exec.LookPath("node")
+	if err != nil {
+		t.Skip("node not installed")
+	}
+	out, err := exec.Command(node, "jstest/tel_intro.test.mjs").CombinedOutput()
+	if err != nil {
+		t.Fatalf("intro failed:\n%s", out)
+	}
+	t.Logf("%s", out)
+}
+
+// The sign-in picker: every calling code, no readable names, region remembered.
+func TestJSTelDial(t *testing.T) {
+	node, err := exec.LookPath("node")
+	if err != nil {
+		t.Skip("node not installed")
+	}
+	out, err := exec.Command(node, "jstest/tel_dial.test.mjs").CombinedOutput()
+	if err != nil {
+		t.Fatalf("tel dial failed:\n%s", out)
+	}
+	t.Logf("%s", out)
+}
+
+// A bot's URL button goes through the link sheet, never straight out.
+func TestJSTelButtons(t *testing.T) {
+	node, err := exec.LookPath("node")
+	if err != nil {
+		t.Skip("node not installed")
+	}
+	out, err := exec.Command(node, "jstest/tel_buttons.test.mjs").CombinedOutput()
+	if err != nil {
+		t.Fatalf("tel buttons failed:\n%s", out)
+	}
+	t.Logf("%s", out)
+}
+
+// "Reload chats" merges its page into the list instead of shrinking the list
+// to it, "load more chats" names the conversation it continues from, the
+// open chat shows its member count, and every round trip draws the strip.
+func TestJSTelegramDialogListKeepsRows(t *testing.T) {
+	node, err := exec.LookPath("node")
+	if err != nil {
+		t.Skip("node not installed")
+	}
+	for _, f := range []string{"jstest/tel_reload_keeps_rows.test.mjs", "jstest/tel_more_cursor.test.mjs", "jstest/tel_members.test.mjs", "jstest/tel_quiet_progress.test.mjs", "jstest/tel_header_buttons.test.mjs", "jstest/tel_dialog_order.test.mjs", "jstest/tel_profile.test.mjs", "jstest/tel_about.test.mjs"} {
+		out, err := exec.Command(node, f).CombinedOutput()
+		if err != nil {
+			t.Fatalf("%s failed:\n%s", f, out)
+		}
+		t.Logf("%s: %s", f, out)
+	}
+}
